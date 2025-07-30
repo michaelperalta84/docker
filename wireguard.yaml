@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  wireguard:
+    image: linuxserver/wireguard
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN        # Necesario para gestionar interfaces de red
+      - SYS_MODULE       # Para cargar módulos del kernel si es necesario
+    environment:
+      - PUID=1000        # ID de usuario en host para permisos de archivos
+      - PGID=1000        # ID de grupo en host para permisos de archivos
+      - TZ=America/Santo_Domingo  # Zona horaria, ajustar según ubicación
+      - SERVERURL=tu_dominio_o_ip_publica  # Dirección pública para el cliente
+      - SERVERPORT=51820  # Puerto UDP para WireGuard
+      - PEERS=1           # Número de peers clientes que quieres configurar
+      - PEERDNS=1.1.1.1   # DNS que usarán los clientes
+      - ALLOWEDIPS=0.0.0.0/0  # Rutas que pasarán por VPN
+    volumes:
+      - ./config:/config  # Donde se guarda la configuración y claves
+      - /lib/modules:/lib/modules:ro  # Permite cargar módulos del kernel desde host
+    ports:
+      - 51820:51820/udp  # Exponer el puerto UDP para conexión
+    restart: unless-stopped
